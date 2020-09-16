@@ -9,6 +9,8 @@ const Binance = require('node-binance-api')
 const binance = require('binance-api-node').default
 const nodemailer = require('nodemailer')
 const TeleBot = require('telebot')
+const env = require('./env')
+const { EnvError } = require('envalid')
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -30,7 +32,7 @@ const mailTransport = nodemailer.createTransport(`smtps://${gmailEmail}:${gmailP
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-const bva_key = "replace_with_your_BvA_key" 
+const bva_key = env.BVA_API_KEY
 
 //////////////////////////////////////////////////////////////////////////////////
 //         VARIABLES TO KEEP TRACK OF BOT POSITIONS AND ACTIVITY
@@ -51,15 +53,15 @@ let minimums = {}
 
 const app = express()
 app.get('/', (req, res) => res.send(""))
-app.listen(process.env.PORT || 8003, () => console.log('NBT auto trader running.'.grey))
+app.listen(env.PORT, () => console.log('NBT auto trader running.'.grey))
 
 
 //////////////////////////////////////////////////////////////////////////////////
 //              TELEGRAM BOT 
 //////////////////////////////////////////////////////////////////////////////////
 if(use_telegram){
-    const telegramToken = 'replace_with_your_BOT_token' //BOT TOKEN -> ask BotFather
-    let telChanel = -123456789 //Replace with your Chanel ID. if needed help go uncoment LINES 723 and 724
+    const telegramToken = env.TELEGRAM_TOKEN //BOT TOKEN -> ask BotFather
+    let telChanel = env.TELEGRAM_CHAT_ID //Replace with your Chanel ID. if needed help go uncoment LINES 723 and 724
     
     const telBot = new TeleBot({
     token: telegramToken, // Required. Telegram Bot API token.
@@ -97,19 +99,19 @@ const margin_pairs = ['ADABTC', 'ATOMBTC','BATBTC','BCHBTC','BNBBTC','DASHBTC','
 //////////////////////////////////////////////////////////////////////////////////
 
 const bnb_client = new Binance().options({
-    APIKEY: '',
-    APISECRET: ''
+    APIKEY: env.BINANCE_API_KEY,
+    APISECRET: env.BINANCE_SECRET_KEY
 })
 
 
 const binance_client = binance({
-    apiKey: '',
-    apiSecret: '',
+    apiKey: env.BINANCE_API_KEY,
+    apiSecret: env.BINANCE_SECRET_KEY,
 })
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const nbt_vers = "0.2.4"
+const nbt_vers = env.VERSION
 const socket = io('https://nbt-hub.herokuapp.com', { query: "v="+nbt_vers+"&type=client&key=" + bva_key })
 
 socket.on('connect', () => {
