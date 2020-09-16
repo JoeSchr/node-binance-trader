@@ -19,7 +19,7 @@ const { EnvError } = require('envalid')
 //////////////////////////////////////////////////////////////////////////////////
 
 const send_email = false // USE SEND MAIL ---- true = YES; false = NO
-const use_telegram = false //USE TELEGRAM 
+const use_telegram = true //USE TELEGRAM 
 const gmail_address = ''
 const gmail_app_password = ''
 const gmailEmail = encodeURIComponent(gmail_address)
@@ -59,11 +59,13 @@ app.listen(env.PORT, () => console.log('NBT auto trader running.'.grey))
 //////////////////////////////////////////////////////////////////////////////////
 //              TELEGRAM BOT 
 //////////////////////////////////////////////////////////////////////////////////
+
+const telegramToken = env.TELEGRAM_TOKEN //BOT TOKEN -> ask BotFather
+let telChanel = env.TELEGRAM_CHAT_ID //Replace with your Chanel ID. if needed help go uncoment LINES 723 and 724
+let telBot
+
 if(use_telegram){
-    const telegramToken = env.TELEGRAM_TOKEN //BOT TOKEN -> ask BotFather
-    let telChanel = env.TELEGRAM_CHAT_ID //Replace with your Chanel ID. if needed help go uncoment LINES 723 and 724
-    
-    const telBot = new TeleBot({
+    telBot = new TeleBot({
     token: telegramToken, // Required. Telegram Bot API token.
     polling: { // Optional. Use polling.
     interval: 700, // Optional. How often check updates (in ms).
