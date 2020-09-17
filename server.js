@@ -24,7 +24,7 @@ const pg_connectionString = env.DATABASE_URL
 const pg_connectionSSL = true
 
 // to monitor your strategy you can send your buy and sell signals to http://bitcoinvsaltcoins.com
-const send_signal_to_bva = false
+const send_signal_to_bva = true
 const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
@@ -33,9 +33,9 @@ const timeframe = '15m'
 const nbt_vers = env.VERSION
 
 const pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHBTC', 'ENJBTC',
-    'EOSBTC', 'ERDBTC', 'ETCBTC', 'ETHBTC', 'ETHUSDT', 'FETBTC', 'ICXBTC', 'IOTABTC', 'LINKBTC',
-    'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'THETABTC', 'TOMOBTC',
-    'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT']
+    'EOSBTC', 'ERDBTC', 'ETCBTC', 'ETHBTC', 'ETHUSDT', 'FETBTC', 'ICXBTC', 'IOTABTC', 'KAVABTC', 'LENDBTC', 'LINKBTC',
+    'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'STXBTC', 'SXPBTC', 'THETABTC', 'TOMOBTC',
+    'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'YFIIBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT']
 
 const stratname = "MACD_EMA_200"
 
@@ -402,8 +402,8 @@ async function trackPairData(pair) {
 async function checkSignal(pair) {
 
     try {
-        let rsi = await tulind.indicators.stochrsi.indicator([pairData[pair].candle_closes], [14])
-        let rsiLatest = rsi[0][rsi[0].length - 1]
+        //let rsi = await tulind.indicators.stochrsi.indicator([pairData[pair].candle_closes], [14])
+        //let rsiLatest = rsi[0][rsi[0].length - 1]
 
         let macd = await tulind.indicators.macd.indicator([pairData[pair].candle_closes], [12, 26, 9])
 
@@ -411,12 +411,17 @@ async function checkSignal(pair) {
         let macdOlder = macd[2][macd[2].length - 2]
         let macdNewest = macd[2][macd[2].length - 1]
 
+        let ema = await tulind.indicators.ema.indicator([pairData[pair].candle_closes], [200])
+        let emaLatest = ema[0][ema[0].length - 1]
+        let emaUP = pairData[pair].price.isGreaterThan(emaLatest)
 
-        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && rsiLatest < 0.3) {
-            return { isBuy: true, takeProfit: 1, stopLoss: -1 }
+
+
+        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
+            return { isBuy: true, takeProfit: 7.5, stopLoss: -2.5 }
         }
-        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && rsiLatest > 0.7) {
-            return { isBuy: false, takeProfit: 1, stopLoss: -1 }
+        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
+            return { isBuy: false, takeProfit: 7.5, stopLoss: -2.5 }
         }
     } catch (e) {
         console.log(e)
