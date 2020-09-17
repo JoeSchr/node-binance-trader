@@ -6,7 +6,6 @@ const colors = require("colors")
 const BigNumber = require('bignumber.js')
 const axios = require('axios')
 const Binance = require('node-binance-api')
-const binance = require('binance-api-node').default
 const nodemailer = require('nodemailer')
 const TeleBot = require('telebot')
 const env = require('./env')
@@ -103,12 +102,6 @@ const margin_pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHB
 const bnb_client = new Binance().options({
     APIKEY: env.BINANCE_API_KEY,
     APISECRET: env.BINANCE_SECRET_KEY
-})
-
-
-const binance_client = binance({
-    apiKey: env.BINANCE_API_KEY,
-    apiSecret: env.BINANCE_SECRET_KEY,
 })
 
 //////////////////////////////////////////////////////////////////////////////////
