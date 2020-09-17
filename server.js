@@ -24,7 +24,7 @@ const pg_connectionString = env.DATABASE_URL
 const pg_connectionSSL = true
 
 // to monitor your strategy you can send your buy and sell signals to http://bitcoinvsaltcoins.com
-const send_signal_to_bva = true
+const send_signal_to_bva = false
 const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
@@ -401,31 +401,31 @@ async function trackPairData(pair) {
 /////////////////////////////////////////////////////////////////////////////////////////////
 async function checkSignal(pair) {
 
-    try {
-        //let rsi = await tulind.indicators.stochrsi.indicator([pairData[pair].candle_closes], [14])
-        //let rsiLatest = rsi[0][rsi[0].length - 1]
+    // try {
+    //     //let rsi = await tulind.indicators.stochrsi.indicator([pairData[pair].candle_closes], [14])
+    //     //let rsiLatest = rsi[0][rsi[0].length - 1]
 
-        let macd = await tulind.indicators.macd.indicator([pairData[pair].candle_closes], [12, 26, 9])
+    //     let macd = await tulind.indicators.macd.indicator([pairData[pair].candle_closes], [12, 26, 9])
 
-        let macdOldest = macd[2][macd[2].length - 3]
-        let macdOlder = macd[2][macd[2].length - 2]
-        let macdNewest = macd[2][macd[2].length - 1]
+    //     let macdOldest = macd[2][macd[2].length - 3]
+    //     let macdOlder = macd[2][macd[2].length - 2]
+    //     let macdNewest = macd[2][macd[2].length - 1]
 
-        let ema = await tulind.indicators.ema.indicator([pairData[pair].candle_closes], [200])
-        let emaLatest = ema[0][ema[0].length - 1]
-        let emaUP = pairData[pair].price.isGreaterThan(emaLatest)
+    //     let ema = await tulind.indicators.ema.indicator([pairData[pair].candle_closes], [200])
+    //     let emaLatest = ema[0][ema[0].length - 1]
+    //     let emaUP = pairData[pair].price.isGreaterThan(emaLatest)
 
 
 
-        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
-            return { isBuy: true, takeProfit: 7.5, stopLoss: -2.5 }
-        }
-        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
-            return { isBuy: false, takeProfit: 7.5, stopLoss: -2.5 }
-        }
-    } catch (e) {
-        console.log(e)
-    }
+    //     if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
+    //         return { isBuy: true, takeProfit: 7.5, stopLoss: -2.5 }
+    //     }
+    //     if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
+    //         return { isBuy: false, takeProfit: 7.5, stopLoss: -2.5 }
+    //     }
+    // } catch (e) {
+    //     console.log(e)
+    // }
     return null
 }
 ///////////////////////////////////////////////////////////////////////////////////////////
