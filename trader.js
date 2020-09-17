@@ -91,10 +91,9 @@ if(use_telegram){
 }
 //////////////////////////////////////////////////////////////////////////////////
 
-const margin_pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHBTC', 'ENJBTC',
-'EOSBTC', 'ERDBTC', 'ETCBTC', 'ETHBTC', 'ETHUSDT', 'FETBTC', 'ICXBTC', 'IOTABTC', 'LINKBTC',
-'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'THETABTC', 'TOMOBTC',
-'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT']
+const margin_pairs = ['ADABTC', 'ATOMBTC','BATBTC','BCHBTC','BNBBTC','DASHBTC','EOSBTC','ETCBTC',
+'ETHBTC','IOSTBTC','IOTABTC','LINKBTC','LTCBTC','MATICBTC','NEOBTC','ONTBTC','QTUMBTC',
+'RVNBTC','TRXBTC','VETBTC','XLMBTC','XMRBTC','XRPBTC','XTZBTC','ZECBTC']
 
 //////////////////////////////////////////////////////////////////////////////////
 

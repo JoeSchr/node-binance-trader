@@ -51,7 +51,7 @@ console.log("send_signal_to_bva: ", send_signal_to_bva)
 let pairData = {}
 let openSignals = {}
 
-const nbt_prefix = "nbt_"
+const nbt_prefix = "nbt_4h_"
 const interv_time = 10000
 
 /////////////////////////////////////////////////////////////////////////////////
