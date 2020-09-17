@@ -1,6 +1,5 @@
 const express = require('express')
 const io = require('socket.io-client')
-const moment = require('moment')
 const _ = require('lodash')
 const colors = require("colors")
 const BigNumber = require('bignumber.js')
