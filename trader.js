@@ -18,7 +18,7 @@ const env = require('./env')
 //////////////////////////////////////////////////////////////////////////////////
 
 const send_email = false // USE SEND MAIL ---- true = YES; false = NO
-const use_telegram = true //USE TELEGRAM 
+const use_telegram = false //USE TELEGRAM 
 const gmail_address = ''
 const gmail_app_password = ''
 const gmailEmail = encodeURIComponent(gmail_address)
