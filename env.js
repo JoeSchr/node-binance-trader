@@ -9,6 +9,7 @@ module.exports = envalid.cleanEnv(process.env, {
     BINANCE_SECRET_KEY: envalid.str({ default: ''}),
     DATABASE_URL: envalid.str(),
     BVA_API_KEY: envalid.str(),
+    USE_TELEGRAM: envalid.bool({ default: "true" }),
     TELEGRAM_TOKEN: envalid.str(),
     TELEGRAM_CHAT_ID: envalid.num()
 })

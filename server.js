@@ -19,7 +19,7 @@ const INDEX = path.join(__dirname, 'index.html')
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-const insert_into_db = true
+const insert_into_db = false
 const pg_connectionString = env.DATABASE_URL
 const pg_connectionSSL = true
 
@@ -28,16 +28,16 @@ const send_signal_to_bva = true
 const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
-const timeframe = '4h'
+const timeframe = '30m'
 
 const nbt_vers = env.VERSION
 
 const pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHBTC', 'ENJBTC',
     'EOSBTC', 'ERDBTC', 'ETCBTC', 'ETHBTC', 'ETHUSDT', 'FETBTC', 'ICXBTC', 'IOTABTC', 'KAVABTC', 'LENDBTC', 'LINKBTC',
     'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'STXBTC', 'SXPBTC', 'THETABTC', 'TOMOBTC',
-    'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'YFIIBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT']
+    'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'YFIIBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT', 'XTZUSDT']
 
-const stratname = "MACD_EMA_200"
+const stratname = "MACD_30m"
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -418,10 +418,10 @@ async function checkSignal(pair) {
 
 
         if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
-            return { isBuy: true, takeProfit: 7.5, stopLoss: -2.5 }
+            return { isBuy: true, takeProfit: 7.5, stopLoss: -2 }
         }
         if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
-            return { isBuy: false, takeProfit: 7.5, stopLoss: -2.5 }
+            return { isBuy: false, takeProfit: 7.5, stopLoss: -2 }
         }
     } catch (e) {
         console.log(e)
