@@ -28,7 +28,7 @@ const send_signal_to_bva = true
 const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
-const timeframe = '30m'
+const timeframe = '4h'
 
 const nbt_vers = env.VERSION
 
@@ -37,7 +37,7 @@ const pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHBTC', 'E
     'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'STXBTC', 'SXPBTC', 'THETABTC', 'TOMOBTC',
     'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'YFIIBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT', 'XTZUSDT']
 
-const stratname = "MACD_30m"
+const stratname = "MACD_EMA_200"
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
