@@ -28,7 +28,7 @@ const send_signal_to_bva = true
 const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
-const timeframe = '4h'
+const timeframe = '12h'
 
 const nbt_vers = env.VERSION
 
@@ -37,7 +37,7 @@ const pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHBTC', 'E
     'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'STXBTC', 'SXPBTC', 'THETABTC', 'TOMOBTC',
     'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'YFIIBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT', 'XTZUSDT']
 
-const stratname = "MACD_EMA_200"
+const stratname = "MACMA12"
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -314,7 +314,7 @@ async function trackPairData(pair) {
             //////// SIGNAL CONDITION ///////
             let signalCheck = await checkSignal(pair)
 
-            if (signalCheck && !openSignals[pair + signal_key]) {
+            if (signalCheck && !openSignals[pair + signal_key] && !signalCheck.exit) {
 
                 const signal = {
                     key: bva_key,
@@ -362,7 +362,7 @@ async function trackPairData(pair) {
                         stratname: stratname,
                         pair: pair
                     }
-                    
+
                     if (openSignal.type === "LONG") {
                         signal.sell_price = Number(first_bid_price)
                     } else {
@@ -372,7 +372,7 @@ async function trackPairData(pair) {
                     console.log("CLOSE", openSignal.type, signal)
 
                     if (send_signal_to_bva) { socket_client.emit(openSignal.type === "LONG" ? "sell_signal" : "buy_signal", signal) }
-                    
+
                     // remove open signal
                     delete openSignals[pair + signal_key]
                 }
@@ -416,13 +416,26 @@ async function checkSignal(pair) {
         let emaUP = pairData[pair].price.isGreaterThan(emaLatest)
 
 
-
+        //Long trade
         if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
             return { isBuy: true, takeProfit: 7.5, stopLoss: -2 }
         }
+
+        if (macdNewest <= 0 && macdOlder > 0 && macdOldest > 0) {
+            return { isBuy: false, takeProfit: 7.5, stopLoss: -2, exit: true }
+        }
+
+
+        //Short Trade
         if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
             return { isBuy: false, takeProfit: 7.5, stopLoss: -2 }
         }
+
+        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0) {
+            return { isBuy: true, takeProfit: 7.5, stopLoss: -2, exit: true }
+        }
+
+
     } catch (e) {
         console.log(e)
     }
