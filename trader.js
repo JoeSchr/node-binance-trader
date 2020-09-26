@@ -74,7 +74,7 @@ socket.on('disconnect', () => {
 
 socket.on('message', (message) => {
     console.log(colors.magenta("NBT Message: " + message))
-    telBot.info(`NBT Message: \n ${message}`)
+    //telBot.info(`NBT Message: \n ${message}`)
 })
 
 socket.on('buy_signal', async (signal) => {
@@ -145,7 +145,7 @@ socket.on('buy_signal', async (signal) => {
                             console.log(" mgMarketBuy BTCUSDT SUCESS 3")
 
                             if (env.USE_TELEGRAM) {
-                                telBot.info(`BTC/USDT Margin Buy Executed \nAmount: ${Number(user_payload[tresult].buy_amount)}`)
+                                telBot.info(`Margin Buy Executed \nBTC/USDT \nAmount: ${Number(user_payload[tresult].buy_amount)}`)
                             }
                         }
                     })
@@ -186,7 +186,7 @@ socket.on('buy_signal', async (signal) => {
                                 else {
                                     console.log("SUCCESS 222444222")
                                     if (env.USE_TELEGRAM) {
-                                        telBot.info(`${alt}/BTC Margin Buy Executed \nAmount: ${Number(qty)}`)
+                                        telBot.info(`Margin Buy Executed \n${alt}/BTC \nAmount: ${Number(qty)}`)
                                     }
                                 }
                             })
@@ -206,7 +206,7 @@ socket.on('buy_signal', async (signal) => {
                                     console.log("SUCESS 99111 marketBuy", alt + "BTC", Number(qty))
 
                                     if (env.USE_TELEGRAM) {
-                                        telBot.info(`${alt}/BTC Normal Buy Executed \nAmount: ${Number(qty)}`)
+                                        telBot.info(`Normal Buy Executed \n${alt}/BTC \nAmount: ${Number(qty)}`)
                                     }
                                 }
                             })
@@ -348,7 +348,7 @@ socket.on('buy_signal', async (signal) => {
                                     else {
                                         console.log("SUCCESS 333342111")
                                         if (env.USE_TELEGRAM) {
-                                            telBot.info(`${alt}/BTC Repay Executed \nAmount: ${Number(qty)}`)
+                                            telBot.info(`Repay Executed \n${alt}/BTC \nAmount: ${Number(qty)}`)
                                         }
                                     }
                                 })
@@ -452,7 +452,7 @@ socket.on('sell_signal', async (signal) => {
                                 else {
                                     console.log("mgMarketSell BTCUSDT SUCCESS 2222")
                                     if (env.USE_TELEGRAM) {
-                                        telBot.info(`BTC/USDT Margin Sell Executed \nAmount: ${Number(user_payload[tresult].buy_amount)}`)
+                                        telBot.info(`Margin Sell Executed \nBTC/USDT \nAmount: ${Number(user_payload[tresult].buy_amount)}`)
                                     }
                                 }
                             })
@@ -503,7 +503,7 @@ socket.on('sell_signal', async (signal) => {
                                     else {
                                         console.log("SUCCESS 22222222")
                                         if (env.USE_TELEGRAM) {
-                                            telBot.info(`Margin Market Sell Executed \n ${alt}/BTC \nAmount: ${Number(qty)}`)
+                                            telBot.info(`Margin Market Sell Executed \n${alt}/BTC \nAmount: ${Number(qty)}`)
                                         }
                                     }
                                 })
@@ -578,7 +578,7 @@ socket.on('sell_signal', async (signal) => {
                         } else {
                             console.log("mgMarketSell BTCUSDT SUCCESS 7222")
                             if (env.USE_TELEGRAM) {
-                                telBot.info(`BTC/USDT Margin Sell Executed \nAmount: ${Number(trading_qty[signal.pair + signal.stratid])} of BTC`)
+                                telBot.info(`Margin Sell Executed \nBTC/USDT  \nAmount: ${Number(trading_qty[signal.pair + signal.stratid])} of BTC`)
                             }
                         }
                     })
@@ -701,7 +701,7 @@ socket.on('close_traded_signal', async (signal) => {
                         else {
                             console.log("mgMarketSell BTCUSDT SUCCESS 2222")
                             if (env.USE_TELEGRAM) {
-                                telBot.info(`BTC/USDT Margin Sell Executed \nAmount: ${Number(signal.qty)}`)
+                                telBot.info(`Margin Sell Executed \nBTC/USDT \nAmount: ${Number(signal.qty)}`)
                             }
                         }
                     })
@@ -726,7 +726,7 @@ socket.on('close_traded_signal', async (signal) => {
                                 else {
                                     console.log("SUCESS 44444", alt, Number(qty))
                                     if (env.USE_TELEGRAM) {
-                                        telBot.info(`Margin Market Sell Executed \n ${alt}/BTC \nAmount: ${Number(qty)}`)
+                                        telBot.info(`Margin Market Sell Executed \n${alt}/BTC \nAmount: ${Number(qty)}`)
                                     }
                                 }
                             })
