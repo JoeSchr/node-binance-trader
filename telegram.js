@@ -42,13 +42,13 @@ exports.start = function (trading_pairs) {
     });
 
     //Get Binace Spot Balance
-    telBot.on('/balance', async (msg) => {
-        let response = "-------SPOT BALANCE-----\n"
-        available_balances.forEach(c => {
-            response += c.asset + ": " + c.available + "\n"
-        })
-        return telBot.sendMessage(env.TELEGRAM_CHAT_ID, response)
-    })
+    // telBot.on('/balance', async (msg) => {
+    //     let response = "-------SPOT BALANCE-----\n"
+    //     available_balances.forEach(c => {
+    //         response += c.asset + ": " + c.available + "\n"
+    //     })
+    //     return telBot.sendMessage(env.TELEGRAM_CHAT_ID, response)
+    // })
 
     telBot.start();
 

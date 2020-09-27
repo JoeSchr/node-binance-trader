@@ -45,6 +45,7 @@ const stratname = "MACMA12"
 
 console.log("insert_into_db: ", insert_into_db)
 console.log("send_signal_to_bva: ", send_signal_to_bva)
+console.log("Strategy: ", stratname)
 
 /////////////////////
 
