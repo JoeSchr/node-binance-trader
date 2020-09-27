@@ -52,7 +52,7 @@ exports.start = function (trading_pairs) {
 
     telBot.start();
 
-    return telBot;
+    return true;
 
 }
 
