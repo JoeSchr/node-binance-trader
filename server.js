@@ -28,7 +28,7 @@ const send_signal_to_bva = true
 const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
-const timeframe = '3h'
+const timeframe = '4h'
 
 const nbt_vers = env.VERSION
 
