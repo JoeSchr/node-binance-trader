@@ -432,11 +432,11 @@ async function checkSignal(pair) {
 
         //Exit Long & Short if openSignal
         if (openTrades.includes(pair + stratname)) {
-            if (macdNewest <= 0) {
+            if (macdNewest <= 0 && macdOlder > 0 && macdOldest > 0) {
                 return { isBuy: false, exit: true }
             }
 
-            if (macdNewest >= 0) {
+            if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0) {
                 return { isBuy: true, exit: true }
             }
         }
