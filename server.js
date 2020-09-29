@@ -357,8 +357,29 @@ async function trackPairData(pair) {
                     first_bid_price.minus(openSignal.buy_price).times(100).dividedBy(openSignal.buy_price) :
                     BigNumber(openSignal.sell_price).minus(first_ask_price).times(100).dividedBy(openSignal.sell_price)
 
-                if (pnl.isLessThan(openSignals[pair + signal_key].stop_loss) || pnl.isGreaterThan(openSignals[pair + signal_key].stop_profit) || signalCheck.exit) {
+                if (pnl.isLessThan(openSignals[pair + signal_key].stop_loss) || pnl.isGreaterThan(openSignals[pair + signal_key].stop_profit)) {
 
+                    const signal = {
+                        key: bva_key,
+                        stratname: stratname,
+                        pair: pair
+                    }
+
+                    if (openSignal.type === "LONG") {
+                        signal.sell_price = Number(first_bid_price)
+                    } else {
+                        signal.buy_price = Number(first_ask_price)
+                    }
+
+                    console.log("CLOSE", openSignal.type, signal)
+
+                    if (send_signal_to_bva) { socket_client.emit(openSignal.type === "LONG" ? "sell_signal" : "buy_signal", signal) }
+
+                    // remove open signal
+                    delete openSignals[pair + signal_key]
+                }
+
+                if (signalCheck && signalCheck.exit) {
                     const signal = {
                         key: bva_key,
                         stratname: stratname,
@@ -421,11 +442,11 @@ async function checkSignal(pair) {
 
         //Enter Long & Short
         if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
-            return { isBuy: true, takeProfit: 10, stopLoss: -4 }
+            return { isBuy: true, takeProfit: 10, stopLoss: -4, exit: false }
         }
 
         if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
-            return { isBuy: false, takeProfit: 10, stopLoss: -4 }
+            return { isBuy: false, takeProfit: 10, stopLoss: -4, exit: false }
         }
 
 
