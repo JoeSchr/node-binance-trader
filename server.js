@@ -58,6 +58,7 @@ const interv_time = 10000
 /////////////////////////////////////////////////////////////////////////////////
 
 let socket_client = {}
+
 if (send_signal_to_bva) {
     console.log("Connection to NBT HUB...")
     // retrieve previous open signals from HUB
@@ -315,7 +316,7 @@ async function trackPairData(pair) {
             //////// SIGNAL CONDITION ///////
             let signalCheck = await checkSignal(pair)
 
-            if (signalCheck && !openSignals[pair + signal_key] && !signalCheck.exit) {
+            if (signalCheck && !signalCheck.exit && !openSignals[pair + signal_key]) {
 
                 const signal = {
                     key: bva_key,
@@ -356,7 +357,7 @@ async function trackPairData(pair) {
                     first_bid_price.minus(openSignal.buy_price).times(100).dividedBy(openSignal.buy_price) :
                     BigNumber(openSignal.sell_price).minus(first_ask_price).times(100).dividedBy(openSignal.sell_price)
 
-                if (pnl.isLessThan(openSignals[pair + signal_key].stop_loss) || pnl.isGreaterThan(openSignals[pair + signal_key].stop_profit)) {
+                if (pnl.isLessThan(openSignals[pair + signal_key].stop_loss) || pnl.isGreaterThan(openSignals[pair + signal_key].stop_profit) || signalCheck.exit) {
 
                     const signal = {
                         key: bva_key,
@@ -416,25 +417,31 @@ async function checkSignal(pair) {
         let emaLatest = ema[0][ema[0].length - 1]
         let emaUP = pairData[pair].price.isGreaterThan(emaLatest)
 
+        let openTrades = _.keys(openSignals)
 
-        //Long trade
+        //Enter Long & Short
         if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
-            return { isBuy: true, takeProfit: 7.5, stopLoss: -2 }
+            return { isBuy: true, takeProfit: 10, stopLoss: -4 }
         }
 
-        if (macdNewest <= 0 && macdOlder > 0 && macdOldest > 0) {
-            return { isBuy: false, takeProfit: 7.5, stopLoss: -2, exit: true }
-        }
-
-
-        //Short Trade
         if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
-            return { isBuy: false, takeProfit: 7.5, stopLoss: -2 }
+            return { isBuy: false, takeProfit: 10, stopLoss: -4 }
         }
 
-        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0) {
-            return { isBuy: true, takeProfit: 7.5, stopLoss: -2, exit: true }
+
+
+        //Exit Long & Short if openSignal
+        if (openTrades.includes(pair + stratname)) {
+            if (macdNewest <= 0) {
+                return { isBuy: false, exit: true }
+            }
+
+            if (macdNewest >= 0) {
+                return { isBuy: true, exit: true }
+            }
         }
+
+
 
 
     } catch (e) {
