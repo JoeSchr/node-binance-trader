@@ -425,8 +425,8 @@ async function trackPairData(pair) {
 async function checkSignal(pair) {
 
     try {
-        //let rsi = await tulind.indicators.stochrsi.indicator([pairData[pair].candle_closes], [14])
-        //let rsiLatest = rsi[0][rsi[0].length - 1]
+        let rsi = await tulind.indicators.stochrsi.indicator([pairData[pair].candle_closes], [14])
+        let rsiLatest = rsi[0][rsi[0].length - 1]
 
         let macd = await tulind.indicators.macd.indicator([pairData[pair].candle_closes], [12, 26, 9])
 
@@ -441,12 +441,12 @@ async function checkSignal(pair) {
         let openTrades = _.keys(openSignals)
 
         //Enter Long & Short
-        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP) {
-            return { isBuy: true, takeProfit: 10, stopLoss: -4, exit: false }
+        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP && rsiLatest < 0.3) {
+            return { isBuy: true, takeProfit: 4, stopLoss: -2, exit: false }
         }
 
-        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP) {
-            return { isBuy: false, takeProfit: 10, stopLoss: -4, exit: false }
+        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP && rsiLatest > 0.7) {
+            return { isBuy: false, takeProfit: 4, stopLoss: -2, exit: false }
         }
 
 
