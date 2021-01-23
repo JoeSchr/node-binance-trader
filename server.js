@@ -8,8 +8,9 @@ const _ = require('lodash')
 const tulind = require('tulind')
 const axios = require('axios')
 const { Client } = require('pg')
+const env = require('./env')
 
-const PORT = process.env.PORT || 4000
+const PORT = env.PORT
 const INDEX = path.join(__dirname, 'index.html')
 
 //////////////////////////////////////////////////////////////////////////////////
@@ -19,20 +20,24 @@ const INDEX = path.join(__dirname, 'index.html')
 //////////////////////////////////////////////////////////////////////////////////
 
 const insert_into_db = false
-const pg_connectionString = 'postgres://postgres@127.0.0.1:5432/postgres'
-const pg_connectionSSL = false
+const pg_connectionString = env.DATABASE_URL
+const pg_connectionSSL = true
 
 // to monitor your strategy you can send your buy and sell signals to http://bitcoinvsaltcoins.com
-const send_signal_to_bva = false
-const bva_key = "replace_with_your_BvA_key"
+const send_signal_to_bva = true
+const bva_key = env.BVA_API_KEY
 
 const wait_time = 800
+const timeframe = '4h'
 
-const nbt_vers = "0.2.4"
+const nbt_vers = env.VERSION
 
-const pairs = ['BTCUSDT'] //, 'ETHBTC', 'XRPBTC', 'XRPETH']
+const pairs = ['ADABTC', 'ALGOBTC', 'ATOMBTC', 'BATBTC', 'BNBBTC', 'DASHBTC', 'ENJBTC',
+    'EOSBTC', 'ERDBTC', 'ETCBTC', 'ETHBTC', 'ETHUSDT', 'FETBTC', 'ICXBTC', 'IOTABTC', 'KAVABTC', 'LENDBTC', 'LINKBTC',
+    'LTCBTC', 'MTLBTC', 'NANOBTC', 'OMGBTC', 'ONTBTC', 'QTUMBTC', 'RENBTC', 'STXBTC', 'SXPBTC', 'THETABTC', 'TOMOBTC',
+    'WAVESBTC', 'XEMBTC', 'XLMBTC', 'XMRBTC', 'XRPBTC', 'XTZBTC', 'YFIIBTC', 'ZECBTC', 'ZRXBTC', 'BTCUSDT', 'XTZUSDT']
 
-const stratname = "DEMO STRATS"
+const stratname = "MACMA12"
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -40,18 +45,20 @@ const stratname = "DEMO STRATS"
 
 console.log("insert_into_db: ", insert_into_db)
 console.log("send_signal_to_bva: ", send_signal_to_bva)
+console.log("Strategy: ", stratname)
 
 /////////////////////
 
 let pairData = {}
 let openSignals = {}
 
-const nbt_prefix = "nbt_"
+const nbt_prefix = "nbt_4h_"
 const interv_time = 10000
 
 /////////////////////////////////////////////////////////////////////////////////
 
 let socket_client = {}
+
 if (send_signal_to_bva) {
     console.log("Connection to NBT HUB...")
     // retrieve previous open signals from HUB
@@ -178,14 +185,14 @@ async function trackPairData(pair) {
     initPairData(pair)
 
     // get start candles
-    const candles = await binance_client.candles({ symbol: pair, interval: '15m' })
+    const candles = await binance_client.candles({ symbol: pair, interval: timeframe })
     for (var i = 0, len = candles.length; i < len; i++) {
         addCandle(pair, candles[i])
     }
     await sleep(wait_time)
 
     // setup candle websocket
-    const candlesWs = binance_client.ws.candles(pair, '15m', async candle => {
+    const candlesWs = binance_client.ws.candles(pair, timeframe, async candle => {
 
         updateLastCandle(pair, candle)
         if (candle.isFinal) {
@@ -309,7 +316,7 @@ async function trackPairData(pair) {
             //////// SIGNAL CONDITION ///////
             let signalCheck = await checkSignal(pair)
 
-            if (signalCheck && !openSignals[pair + signal_key]) {
+            if (signalCheck && !signalCheck.exit && !openSignals[pair + signal_key]) {
 
                 const signal = {
                     key: bva_key,
@@ -357,7 +364,7 @@ async function trackPairData(pair) {
                         stratname: stratname,
                         pair: pair
                     }
-                    
+
                     if (openSignal.type === "LONG") {
                         signal.sell_price = Number(first_bid_price)
                     } else {
@@ -367,7 +374,28 @@ async function trackPairData(pair) {
                     console.log("CLOSE", openSignal.type, signal)
 
                     if (send_signal_to_bva) { socket_client.emit(openSignal.type === "LONG" ? "sell_signal" : "buy_signal", signal) }
-                    
+
+                    // remove open signal
+                    delete openSignals[pair + signal_key]
+                }
+
+                if (signalCheck && signalCheck.exit) {
+                    const signal = {
+                        key: bva_key,
+                        stratname: stratname,
+                        pair: pair
+                    }
+
+                    if (openSignal.type === "LONG") {
+                        signal.sell_price = Number(first_bid_price)
+                    } else {
+                        signal.buy_price = Number(first_ask_price)
+                    }
+
+                    console.log("CLOSE", openSignal.type, signal)
+
+                    if (send_signal_to_bva) { socket_client.emit(openSignal.type === "LONG" ? "sell_signal" : "buy_signal", signal) }
+
                     // remove open signal
                     delete openSignals[pair + signal_key]
                 }
@@ -406,12 +434,37 @@ async function checkSignal(pair) {
         let macdOlder = macd[2][macd[2].length - 2]
         let macdNewest = macd[2][macd[2].length - 1]
 
-        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && rsiLatest < 0.3) {
-            return { isBuy: true, takeProfit: 1, stopLoss: -1 }
+        let ema = await tulind.indicators.ema.indicator([pairData[pair].candle_closes], [200])
+        let emaLatest = ema[0][ema[0].length - 1]
+        let emaUP = pairData[pair].price.isGreaterThan(emaLatest)
+
+        let openTrades = _.keys(openSignals)
+
+        //Enter Long & Short
+        if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0 && emaUP && rsiLatest < 0.3) {
+            return { isBuy: true, takeProfit: 4, stopLoss: -2, exit: false }
         }
-        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && rsiLatest > 0.7) {
-            return { isBuy: false, takeProfit: 1, stopLoss: -1 }
+
+        if (macdNewest < 0 && macdOlder >= 0 && macdOldest >= 0 && !emaUP && rsiLatest > 0.7) {
+            return { isBuy: false, takeProfit: 4, stopLoss: -2, exit: false }
         }
+
+
+
+        //Exit Long & Short if openSignal
+        if (openTrades.includes(pair + stratname)) {
+            if (macdNewest <= 0 && macdOlder > 0 && macdOldest > 0) {
+                return { isBuy: false, exit: true }
+            }
+
+            if (macdNewest >= 0 && macdOlder < 0 && macdOldest < 0) {
+                return { isBuy: true, exit: true }
+            }
+        }
+
+
+
+
     } catch (e) {
         console.log(e)
     }
