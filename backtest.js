@@ -6,8 +6,8 @@ const { Client } = require('pg')
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const test_pair = "BTCUSDT"
-const pg_connectionString = 'postgres://postgres@127.0.0.1:5432/postgres'
+const test_pair = "BTCUSDC"
+const pg_connectionString = 'postgres://postgres:postgres@127.0.0.1:5432/postgres'
 const pg_connectionSSL = false
 
 const stop_loss_pnl = -1.0
