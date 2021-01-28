@@ -56,7 +56,7 @@ let minimums = {}
 //////////////////////////////////////////////////////////////////////////////////
 
 const app = express()
-app.get("/", (req, res) => res.send(""))
+app.get("/", (req, res) => res.send("<h1>NBT auto trader running.</h1>"))
 app.listen(process.env.PORT || 8003, () =>
     console.log("NBT auto trader running.".grey)
 )
@@ -103,25 +103,40 @@ const bnb_client = new Binance().options({
 const nbt_vers = "0.2.4"
 const socket = io("https://nbt-hub.herokuapp.com", {
     query: "v=" + nbt_vers + "&type=client&key=" + bva_key,
+    rejectUnauthorized: false,
+    secure: false,
 })
 
 socket.on("connect", () => {
-    console.log("Auto Trader connected.".grey)
+    console.log("Auto Trader connected.".bgGreen)
+    console.log("Socket Status:".grey, socket.connected)
 })
 
 socket.on("disconnect", () => {
-    console.log("Auto Trader disconnected.".grey)
+    console.log("Auto Trader disconnected.".red)
+})
+
+socket.on("connect_error", (e) => {
+    console.log("Connection error:".red, e["type"], e["description"]["code"])
+})
+
+socket.on("reconnect", () => {
+    console.log("Auto Trader reconnected.".red)
 })
 
 socket.on("message", (message) => {
     console.log(colors.magenta("NBT Message: " + message))
 })
 
+socket.on("ping", (message) => {
+    console.log("Ping".bgMagenta, message)
+})
+
 socket.on("buy_signal", async (signal) => {
-    const tresult = _.findIndex(
-        user_payload,
-        (o) => o.stratid == signal.stratid
-    )
+    console.log("trader: on buy_signal", signal)
+    const tresult = _.findIndex(user_payload, (o) => {
+        return o.stratid == signal.stratid
+    })
     if (tresult > -1) {
         if (!trading_pairs[signal.pair + signal.stratid] && signal.new) {
             console.log(
@@ -463,9 +478,10 @@ socket.on("buy_signal", async (signal) => {
 
 socket.on("sell_signal", async (signal) => {
     console.log("trader: on sell_signal", signal)
-    const tresult = _.findIndex(user_payload, (o) => {
-        return o.stratid == signal.stratid
-    })
+    const tresult = _.findIndex(
+        user_payload,
+        (o) => o.stratid == signal.stratid
+    )
     if (tresult > -1) {
         if (!trading_pairs[signal.pair + signal.stratid] && signal.new) {
             console.log(
@@ -1082,12 +1098,12 @@ socket.on("stop_traded_signal", async (signal) => {
 })
 
 socket.on("user_payload", async (data) => {
-    console.log(
-        colors.grey("NBT HUB => user strategies + trading setup updated")
-    )
+    console.log("NBT HUB => user strategies + trading setup updated".grey, data)
     user_payload = data
 })
 
+socket.connect()
+console.log("Opened connection to NBT".grey, socket.connected)
 //////////////////////////////////////////////////////////////////////////////////
 
 async function ExchangeInfo() {
@@ -1116,7 +1132,7 @@ async function ExchangeInfo() {
                 filters.icebergAllowed = obj.icebergAllowed
                 minimums[obj.symbol] = filters
             }
-            console.log(`Exchange Minimums:`, Object.keys(minimums))
+            console.log(`Exchange Minimums:`.grey, Object.keys(minimums).length)
             resolve(true)
         })
     })
@@ -1176,7 +1192,7 @@ async function UpdateOpenTrades() {
 async function run() {
     await ExchangeInfo()
     await UpdateOpenTrades()
-    //await BalancesInfo()
+    await BalancesInfo()
 }
 
 run()
