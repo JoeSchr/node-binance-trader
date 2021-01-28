@@ -1,19 +1,19 @@
-const BigNumber = require('bignumber.js')
-const colors = require('colors')
-const _ = require('lodash')
-const moment = require('moment')
-const { Client } = require('pg')
+const BigNumber = require("bignumber.js")
+const colors = require("colors")
+const _ = require("lodash")
+const moment = require("moment")
+const { Client } = require("pg")
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const test_pair = 'BTCUSDT'
-const pg_connectionString = 'postgres://postgres@127.0.0.1:5432/postgres'
+const test_pair = "BTCUSDT"
+const pg_connectionString = "postgres://postgres@127.0.0.1:5432/postgres"
 const pg_connectionSSL = false
 
 const stop_loss_pnl = -1.0
 const stop_profit_pnl = 7.5
 
-const nbt_prefix = 'nbt_'
+const nbt_prefix = "nbt_"
 const max_rows = 600000
 const showReport = true
 const trading_fees = 0.2
@@ -30,10 +30,10 @@ pg_client.connect()
 
 async function getData(pair) {
     const select_query =
-        'SELECT * FROM ' +
+        "SELECT * FROM " +
         nbt_prefix +
         pair +
-        ' ORDER BY eventtime DESC LIMIT ' +
+        " ORDER BY eventtime DESC LIMIT " +
         max_rows
     return pg_client
         .query(select_query)
@@ -58,7 +58,7 @@ async function backtest(lines) {
 
     let trading = false
     let amount_sold = 0
-    let trading_report = ''
+    let trading_report = ""
     let trading_count = 0
     let trading_start = 0
     let trading_win_count = 0
@@ -103,21 +103,21 @@ async function backtest(lines) {
                     .dividedBy(start_price)
                 trading_report =
                     trading_report +
-                    '\n' +
+                    "\n" +
                     trading_count +
-                    ' ' +
+                    " " +
                     time +
-                    ' ' +
+                    " " +
                     moment(time).format() +
-                    ' HODL @'.magenta +
+                    " HODL @".magenta +
                     price +
-                    ' MinPNL %' +
+                    " MinPNL %" +
                     colors.red(min_pnl.toFormat(2)) +
-                    ' MaxPNL %' +
+                    " MaxPNL %" +
                     colors.cyan(max_pnl.toFormat(2)) +
-                    ' CPNL %' +
+                    " CPNL %" +
                     colors.grey(lpnl.toFormat(2)) +
-                    '\n'
+                    "\n"
             }
         }
 
@@ -158,25 +158,25 @@ async function backtest(lines) {
                 trading_count = trading_count + 1
                 trading_report =
                     trading_report +
-                    '\n\n' +
+                    "\n\n" +
                     trading_count +
-                    ' ' +
+                    " " +
                     time +
-                    ' ' +
+                    " " +
                     moment(time).format() +
-                    ' BUY @'.blue +
+                    " BUY @".blue +
                     price +
-                    ' ' +
+                    " " +
                     colors.red(prices[prices.length - 1]) +
-                    ' ' +
+                    " " +
                     colors.blue(parseInt(volumes[volumes.length - 1])) +
-                    ' dr:'.grey +
+                    " dr:".grey +
                     depth_report.decimalPlaces(2).toString().yellow +
-                    ' mk:'.grey +
+                    " mk:".grey +
                     makers_count.decimalPlaces(2).toString().yellow +
-                    ' si:'.grey +
+                    " si:".grey +
                     colors.blue(srsi) +
-                    ' trd:'.grey +
+                    " trd:".grey +
                     colors.white(trades[trades.length - 1])
                 trading = true
                 trading_start = time
@@ -185,27 +185,27 @@ async function backtest(lines) {
             } else {
                 trading_report =
                     trading_report +
-                    '\n' +
+                    "\n" +
                     trading_count +
-                    ' ' +
+                    " " +
                     time +
-                    ' ' +
+                    " " +
                     moment(time).format() +
-                    ' CONF @'.cyan +
+                    " CONF @".cyan +
                     price +
-                    ' PNL %' +
+                    " PNL %" +
                     colors.yellow(pnl.toFormat(2)) +
-                    ' ' +
+                    " " +
                     colors.red(prices[prices.length - 1]) +
-                    ' ' +
+                    " " +
                     colors.blue(parseInt(volumes[volumes.length - 1])) +
-                    ' dr:'.grey +
+                    " dr:".grey +
                     depth_report.decimalPlaces(2).toString().yellow +
-                    ' mk:'.grey +
+                    " mk:".grey +
                     makers_count.decimalPlaces(2).toString().yellow +
-                    ' si:'.grey +
+                    " si:".grey +
                     colors.blue(srsi) +
-                    ' trd:'.grey +
+                    " trd:".grey +
                     colors.white(trades[trades.length - 1])
             }
         } else if (trading) {
@@ -230,40 +230,40 @@ async function backtest(lines) {
                     trading_win_count = trading_win_count + 1
                     trading_report =
                         trading_report +
-                        '\n' +
+                        "\n" +
                         trading_count +
-                        ' ' +
+                        " " +
                         time +
-                        ' ' +
+                        " " +
                         moment(time).format().grey +
-                        ' SELL @'.yellow +
+                        " SELL @".yellow +
                         colors.grey(first_bid_price) +
-                        ' MinPNL ' +
+                        " MinPNL " +
                         colors.red(min_pnl.toFormat(2)) +
-                        ' MaxPNL ' +
+                        " MaxPNL " +
                         colors.cyan(max_pnl.toFormat(2)) +
-                        ' PNL %' +
+                        " PNL %" +
                         colors.yellow(pnl.toFormat(2)) +
-                        '\n'
+                        "\n"
                 } else {
                     trading_loss_count = trading_loss_count + 1
                     trading_report =
                         trading_report +
-                        '\n' +
+                        "\n" +
                         trading_count +
-                        ' ' +
+                        " " +
                         time +
-                        ' ' +
+                        " " +
                         moment(time).format().red +
-                        ' SELL @'.red +
+                        " SELL @".red +
                         colors.red(first_bid_price) +
-                        ' MinPNL ' +
+                        " MinPNL " +
                         colors.red(min_pnl.toFormat(2)) +
-                        ' MaxPNL ' +
+                        " MaxPNL " +
                         colors.cyan(max_pnl.toFormat(2)) +
-                        ' PNL %' +
+                        " PNL %" +
                         colors.red(pnl.toFormat(2)) +
-                        '\n'
+                        "\n"
                 }
                 stop_loss = stop_loss_pnl
                 stop_profit = stop_profit_pnl
@@ -273,21 +273,21 @@ async function backtest(lines) {
             if (pnl.isGreaterThan(stop_profit)) {
                 trading_report =
                     trading_report +
-                    '\n' +
+                    "\n" +
                     trading_count +
-                    ' ' +
+                    " " +
                     time +
-                    ' ' +
+                    " " +
                     moment(time).format().green +
-                    ' SELL!!! @'.green +
+                    " SELL!!! @".green +
                     colors.green(first_bid_price) +
-                    ' MinPNL ' +
+                    " MinPNL " +
                     colors.red(min_pnl.toFormat(2)) +
-                    ' MaxPNL ' +
+                    " MaxPNL " +
                     colors.cyan(max_pnl.toFormat(2)) +
-                    ' PNL %' +
+                    " PNL %" +
                     colors.green(pnl.toFormat(2)) +
-                    '\n'
+                    "\n"
                 trading = false
                 trading_win_count = trading_win_count + 1
                 curr_pnl = curr_pnl
@@ -306,10 +306,10 @@ async function backtest(lines) {
         (Number(lines[lines.length - 1].eventtime) -
             Number(lines[0].eventtime)) /
         86400000
-    console.log('-----------')
+    console.log("-----------")
     console.log(moment().format().grey)
-    console.log('-----------')
-    console.log(colors.grey(days, 'days'))
+    console.log("-----------")
+    console.log(colors.grey(days, "days"))
     console.log(
         moment(Number(lines[0].eventtime)).format(),
         moment(Number(lines[0].eventtime)).fromNow(),
@@ -320,18 +320,18 @@ async function backtest(lines) {
         moment(Number(lines[lines.length - 1].eventtime)).fromNow(),
         lines[lines.length - 1].candle_close
     )
-    console.log('-----------')
-    console.log('test_pair: ' + test_pair)
-    console.log('trading_fees: ' + trading_fees)
-    console.log('stop_loss_pnl: %'.red + colors.red(stop_loss_pnl))
-    console.log('stop_profit_pnl: %'.green + colors.green(stop_profit_pnl))
-    console.log('first_price: ' + first_price)
-    console.log('last_price: ' + last_price)
-    console.log('trading_count: '.cyan + String(trading_count).magenta)
-    console.log('trading_win_count: '.cyan + String(trading_win_count).blue)
-    console.log('trading_loss_count: '.red + String(trading_win_count).red)
+    console.log("-----------")
+    console.log("test_pair: " + test_pair)
+    console.log("trading_fees: " + trading_fees)
+    console.log("stop_loss_pnl: %".red + colors.red(stop_loss_pnl))
+    console.log("stop_profit_pnl: %".green + colors.green(stop_profit_pnl))
+    console.log("first_price: " + first_price)
+    console.log("last_price: " + last_price)
+    console.log("trading_count: ".cyan + String(trading_count).magenta)
+    console.log("trading_win_count: ".cyan + String(trading_win_count).blue)
+    console.log("trading_loss_count: ".red + String(trading_win_count).red)
     console.log(
-        'HODL PnL: %'.grey +
+        "HODL PnL: %".grey +
             last_price
                 .minus(first_price)
                 .dividedBy(first_price)
@@ -339,28 +339,28 @@ async function backtest(lines) {
                 .minus(0.1)
                 .toFormat(3).grey
     )
-    console.log('Strat PnL: %'.yellow + curr_pnl.toFormat(3).yellow)
+    console.log("Strat PnL: %".yellow + curr_pnl.toFormat(3).yellow)
     console.log(
-        'Daily PnL: '.cyan +
+        "Daily PnL: ".cyan +
             colors.cyan(
                 curr_pnl.dividedBy(days).decimalPlaces(3).toString().cyan
             ) +
-            '% /day'.cyan
+            "% /day".cyan
     )
-    console.log('-----------')
+    console.log("-----------")
     return true
 }
 ////////////////////////////////////////////////////////////////////////////////////
 
 async function run() {
-    console.log('Retrieving DB data...'.green)
+    console.log("Retrieving DB data...".green)
     const lines = await getData(test_pair)
-    console.log('Running backtest... '.green + lines.length)
+    console.log("Running backtest... ".green + lines.length)
     let startbt = Date.now()
-    console.log('starting backtest... '.green)
+    console.log("starting backtest... ".green)
     await backtest(lines)
     console.log(
-        'Ending backtest... '.green + parseInt((Date.now() - startbt) / 1000)
+        "Ending backtest... ".green + parseInt((Date.now() - startbt) / 1000)
     )
 
     process.exit(0)
@@ -368,4 +368,3 @@ async function run() {
 
 run()
 ////////////////////////////////////////////////////////////////////////////////////
-
