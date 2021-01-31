@@ -55,8 +55,10 @@ let minimums = {}
 //////////////////////////////////////////////////////////////////////////////////
 
 const app = express()
-app.get('/', (req, res) => res.send(""))
-app.listen(process.env.PORT || 8003, () => console.log('NBT auto trader running.'.grey))
+app.get('/', (req, res) => res.send('<h1>NBT auto trader running.</h1>'))
+app.listen(process.env.PORT || 8003, () =>
+    console.log('NBT auto trader running.'.grey)
+)
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -295,7 +297,7 @@ socket.on('buy_signal', async (signal) => {
 })
 
 socket.on('sell_signal', async (signal) => {
-    //console.log(signal)
+    console.log('trader: on sell_signal', signal);
     const tresult = _.findIndex(user_payload, (o) => { return o.stratid == signal.stratid })
     if (tresult > -1) {
         if (!trading_pairs[signal.pair+signal.stratid] && signal.new) {
@@ -626,11 +628,12 @@ socket.on('stop_traded_signal', async (signal) => {
 })
 
 socket.on('user_payload', async (data) => {
-    console.log(colors.grey('NBT HUB => user strategies + trading setup updated'))
-    // console.log(data.length)
+    console.log('NBT HUB => user strategies + trading setup updated'.grey, data)
     user_payload = data
 })
 
+socket.connect()
+console.log('Opened connection to NBT'.grey, socket.connected)
 //////////////////////////////////////////////////////////////////////////////////
 
 async function ExchangeInfo() {
@@ -659,6 +662,7 @@ async function ExchangeInfo() {
                 filters.icebergAllowed = obj.icebergAllowed;
                 minimums[obj.symbol] = filters;
             }
+            console.log(`Exchange Minimums:`.grey, Object.keys(minimums).length)
             resolve(true)
         })
     })
@@ -709,7 +713,7 @@ async function UpdateOpenTrades() {
 async function run() {
     await ExchangeInfo()
     await UpdateOpenTrades()
-    //await BalancesInfo()
+    await BalancesInfo()
 }
 
 run()
