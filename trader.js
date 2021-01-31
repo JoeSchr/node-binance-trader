@@ -8,14 +8,7 @@ const axios = require("axios")
 const Binance = require("node-binance-api")
 const nodemailer = require("nodemailer")
 //const TeleBot = require('telebot')
-
-//////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////
-//         PLEASE EDIT WITH YOUR BITCOINvsALTCOINS.com KEY HERE BELLOW
-//////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////////////
-
-const bva_key = "replace_with_your_BvA_key"
+const env = require("./env")
 
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
@@ -23,8 +16,7 @@ const bva_key = "replace_with_your_BvA_key"
 //////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
 
-const bnb_api_key = "replace_with_your_binace_api_key" // Type your Binace API KEY
-const bnb_api_secret = "replace_with_your_binace_api__secret_key" // Type your Binace SECRET KEY
+const bva_key = env.BVA_API_KEY
 //const telegramToken = 'replaceWith:your_BOT_token' //BOT TOKEN -> ask BotFather Please if not use set default value to->> replaceWith:your_BOT_token
 //const telChanel = -12345678910 //Replace with your Chanel ID. Type /chanel in your telegram chanel
 //const use_telegram = false //USE TELEGRAM  ---- true = YES; false = NO
@@ -56,10 +48,8 @@ let minimums = {}
 //////////////////////////////////////////////////////////////////////////////////
 
 const app = express()
-app.get('/', (req, res) => res.send('<h1>NBT auto trader running.</h1>'))
-app.listen(process.env.PORT || 8003, () =>
-    console.log('NBT auto trader running.'.grey)
-)
+app.get("/", (req, res) => res.send("<h1>NBT auto trader running.</h1>"))
+app.listen(env.TRADER_PORT, () => console.log("NBT auto trader running.".grey))
 
 //////////////////////////////////////////////////////////////////////////////////
 
@@ -94,13 +84,13 @@ const margin_pairs = [
 //////////////////////////////////////////////////////////////////////////////////
 
 const bnb_client = new Binance().options({
-    APIKEY: bnb_api_key,
-    APISECRET: bnb_api_secret,
+    APIKEY: env.BINANCE_API_KEY,
+    APISECRET: env.BINANCE_SECRET_KEY,
 })
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const nbt_vers = "0.2.4"
+const nbt_vers = env.VERSION
 const socket = io("https://nbt-hub.herokuapp.com", {
     query: "v=" + nbt_vers + "&type=client&key=" + bva_key,
 })
@@ -218,11 +208,12 @@ socket.on("buy_signal", async (signal) => {
                         }
                     )
                 }
-            }
-            else {
-                const alt = signal.pair.replace('BTC','')
-                if (minimums[alt+'BTC'] && minimums[alt+'BTC'].minQty) {
-                    const buy_amount = new BigNumber(user_payload[tresult].buy_amount)
+            } else {
+                const alt = signal.pair.replace("BTC", "")
+                if (minimums[alt + "BTC"] && minimums[alt + "BTC"].minQty) {
+                    const buy_amount = new BigNumber(
+                        user_payload[tresult].buy_amount
+                    )
                     const btc_qty = buy_amount.dividedBy(signal.price)
                     const qty = bnb_client.roundStep(
                         btc_qty,
@@ -460,9 +451,12 @@ socket.on("buy_signal", async (signal) => {
     }
 })
 
-socket.on('sell_signal', async (signal) => {
-    console.log('trader: on sell_signal', signal);
-    const tresult = _.findIndex(user_payload, (o) =>  o.stratid == signal.stratid )
+socket.on("sell_signal", async (signal) => {
+    console.log("trader: on sell_signal", signal)
+    const tresult = _.findIndex(
+        user_payload,
+        (o) => o.stratid == signal.stratid
+    )
     if (tresult > -1) {
         if (!trading_pairs[signal.pair + signal.stratid] && signal.new) {
             console.log(
@@ -573,11 +567,12 @@ socket.on('sell_signal', async (signal) => {
                         }
                     )
                 }
-            }
-            else {
-                const alt = signal.pair.replace('BTC','')
-                if (minimums[alt+'BTC'] && minimums[alt+'BTC'].minQty) {
-                    const buy_amount = new BigNumber(user_payload[tresult].buy_amount)
+            } else {
+                const alt = signal.pair.replace("BTC", "")
+                if (minimums[alt + "BTC"] && minimums[alt + "BTC"].minQty) {
+                    const buy_amount = new BigNumber(
+                        user_payload[tresult].buy_amount
+                    )
                     const btc_qty = buy_amount.dividedBy(signal.price)
                     const qty = bnb_client.roundStep(
                         btc_qty,
@@ -726,11 +721,10 @@ socket.on('sell_signal', async (signal) => {
                         }
                     )
                 }
-            }
-            else {
-                const alt = signal.pair.replace('BTC','')
-                if (minimums[alt+'BTC'] && minimums[alt+'BTC'].minQty) {
-                    const qty = trading_qty[signal.pair+signal.stratid]
+            } else {
+                const alt = signal.pair.replace("BTC", "")
+                if (minimums[alt + "BTC"] && minimums[alt + "BTC"].minQty) {
+                    const qty = trading_qty[signal.pair + signal.stratid]
                     ///
                     const traded_sell_signal = {
                         key: bva_key,
@@ -860,15 +854,24 @@ socket.on("close_traded_signal", async (signal) => {
             socket.emit("traded_sell_signal", traded_sell_signal)
             //////
             if (user_payload[tresult].trading_type === "real") {
-                console.log(signal.pair, ' ===---==> SELL ', signal.qty)
-                if (signal.pair == 'BTCUSDT') {
-                    bnb_client.mgMarketSell("BTCUSDT", Number(signal.qty), (error, response) => {
-                        if (error) { console.log("ERROR 1212 BTCUSDT", Number(signal.qty), JSON.stringify(error)) }
-                    })
-                }
-                else {
-                    const alt = signal.pair.replace('BTC','')
-                    if (minimums[alt+'BTC'] && minimums[alt+'BTC'].minQty) {
+                console.log(signal.pair, " ===---==> SELL ", signal.qty)
+                if (signal.pair == "BTCUSDT") {
+                    bnb_client.mgMarketSell(
+                        "BTCUSDT",
+                        Number(signal.qty),
+                        (error, response) => {
+                            if (error) {
+                                console.log(
+                                    "ERROR 1212 BTCUSDT",
+                                    Number(signal.qty),
+                                    JSON.stringify(error)
+                                )
+                            }
+                        }
+                    )
+                } else {
+                    const alt = signal.pair.replace("BTC", "")
+                    if (minimums[alt + "BTC"] && minimums[alt + "BTC"].minQty) {
                         const qty = signal.qty
                         ///
                         if (margin_pairs.includes(alt + "BTC")) {
@@ -991,12 +994,11 @@ socket.on("close_traded_signal", async (signal) => {
                                 )
                             }
                         }
-                    })
-                }
-                else {
-                    const alt = signal.pair.replace('BTC','')
-                    if (minimums[alt+'BTC'] && minimums[alt+'BTC'].minQty) {
-                        const qty = trading_qty[signal.pair+signal.stratid]
+                    )
+                } else {
+                    const alt = signal.pair.replace("BTC", "")
+                    if (minimums[alt + "BTC"] && minimums[alt + "BTC"].minQty) {
+                        const qty = trading_qty[signal.pair + signal.stratid]
                         console.log("QTY ==> " + qty + " - " + alt + "BTC")
                         bnb_client.mgMarketBuy(
                             alt + "BTC",
@@ -1069,13 +1071,13 @@ socket.on("stop_traded_signal", async (signal) => {
     }
 })
 
-socket.on('user_payload', async (data) => {
-    console.log('NBT HUB => user strategies + trading setup updated'.grey, data)
+socket.on("user_payload", async (data) => {
+    console.log("NBT HUB => user strategies + trading setup updated".grey, data)
     user_payload = data
 })
 
 socket.connect()
-console.log('Opened connection to NBT'.grey, socket.connected)
+console.log("Opened connection to NBT".grey, socket.connected)
 //////////////////////////////////////////////////////////////////////////////////
 
 async function ExchangeInfo() {
