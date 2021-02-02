@@ -47,34 +47,37 @@ app.listen(env.TRADER_PORT, () => console.log("NBT auto trader running.".grey))
 
 //////////////////////////////////////////////////////////////////////////////////
 
-const margin_pairs = [
-    "ADABTC",
-    "ATOMBTC",
-    "BATBTC",
-    "BCHBTC",
-    "BNBBTC",
-    "DASHBTC",
-    "EOSBTC",
-    "ETCBTC",
-    "ETHBTC",
-    "IOSTBTC",
-    "IOTABTC",
-    "LINKBTC",
-    "LTCBTC",
-    "MATICBTC",
-    "NEOBTC",
-    "ONTBTC",
-    "QTUMBTC",
-    "RVNBTC",
-    "TRXBTC",
-    "VETBTC",
-    "XLMBTC",
-    "XMRBTC",
-    "XRPBTC",
-    "XTZBTC",
-    "ZECBTC",
-]
+const margin_pairs = !env.TRADE_MARGINS
+    ? []
+    : [
+          "ADABTC",
+          "ATOMBTC",
+          "BATBTC",
+          "BCHBTC",
+          "BNBBTC",
+          "DASHBTC",
+          "EOSBTC",
+          "ETCBTC",
+          "ETHBTC",
+          "IOSTBTC",
+          "IOTABTC",
+          "LINKBTC",
+          "LTCBTC",
+          "MATICBTC",
+          "NEOBTC",
+          "ONTBTC",
+          "QTUMBTC",
+          "RVNBTC",
+          "TRXBTC",
+          "VETBTC",
+          "XLMBTC",
+          "XMRBTC",
+          "XRPBTC",
+          "XTZBTC",
+          "ZECBTC",
+      ]
 
+console.log("trading following margin_pairs: \n", margin_pairs)
 //////////////////////////////////////////////////////////////////////////////////
 
 const bnb_client = new Binance().options({

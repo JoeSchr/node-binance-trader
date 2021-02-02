@@ -25,6 +25,11 @@ module.exports = envalid.cleanEnv(process.env, {
         default: 8003,
         desc: "The port to trader webserver runs",
     }),
+    TRADE_MARGINS: envalid.bool({
+        default: false,
+        desc:
+            "Is your margin account activated and do you want to trade margins",
+    }),
     STRATEGY_TIMEFRAME: envalid.str({ default: "15m" }),
     VERSION: envalid.str({ default: pjson.version }),
 })
